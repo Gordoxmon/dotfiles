@@ -1,7 +1,7 @@
 [user]
     name = "Luís Santos"
     email = "filica812@gmail.com"
-    signingkey = "~/.ssh/personalSignature.pub"
+    signingkey = "~/.ssh/personalSignature"
 
 [gpg]
     format = "ssh"
