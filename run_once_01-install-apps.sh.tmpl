@@ -9,14 +9,19 @@ set -euo pipefail
 # Define a list of packages to install.
 apps=(
   kitty
-  neovim
-  zen-browser
+  nvim
+  zen-browser-bin
   jetbrains-toolbox
-  cursor
-  postman
+  cursor-bin
+  postman-bin
   zsh
-  omz
   tmux
+  wl-clipboard
+  ripgrep
+  fzf
+  bitwarden-cli
+  btop
+  neofetch
 )
 
 # Use the chezmoi template variable to check the OS.
