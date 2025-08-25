@@ -1,0 +1,17 @@
+[user]
+    name = "Luís Santos"
+    email = "filica812@gmail.com"
+    signingkey = "~/.ssh/personalSignature.pub"
+
+[gpg]
+    format = "ssh"
+
+[commit]
+    gpgsign = true
+
+[core]
+	sshCommand = "ssh -i /home/gordoxmon/.ssh/personal"
+
+[includeIf "gitdir:~/Documents/Work/"]
+    path = .gitconfig-work
+

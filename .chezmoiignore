@@ -1,0 +1,55 @@
+# This file tells chezmoi what to ignore when managing your home directory.
+# Paths are relative to your home directory (~).
+
+#----------------------------------------------------------------------
+# Common cache directories and files
+#----------------------------------------------------------------------
+# The standard XDG Base Directory Specification for caches.
+.cache/
+
+# Common caches for various applications and package managers.
+.npm/
+.npm/_cacache/
+.yarn/
+.gradle/
+.local/share/npm/
+.npmrc
+.pylint.cache
+.rbenv/
+.rustup/
+.mix_history
+.bash_sessions/
+
+#----------------------------------------------------------------------
+# Log files
+#----------------------------------------------------------------------
+# Standard log directories and files.
+.local/state/
+.log/
+.logs/
+*.log
+.bash_history
+.zsh_history
+.histfile
+.sqlite_history
+.python_history
+.psql_history
+.mysql_history
+
+#----------------------------------------------------------------------
+# Other common files to ignore
+#----------------------------------------------------------------------
+# System and temporary files.
+.DS_Store
+*.swp
+*.swo
+.git/
+.vscode/
+.idea/
+
+# Binaries and downloaded archives.
+*.tar.gz
+*.zip
+*.deb
+*.rpm
+*.exe

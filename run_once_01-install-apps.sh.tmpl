@@ -1,0 +1,70 @@
+#!/bin/bash
+
+# This script runs only once, on first-time setup.
+# It checks if the OS is Arch Linux and if the `yay` package manager is installed.
+# Then, it installs a list of applications if they are not already on the system.
+
+set -euo pipefail
+
+# Define a list of packages to install.
+apps=(
+  kitty
+  neovim
+  zen-browser
+  jetbrains-toolbox
+  cursor
+  postman
+  zsh
+  omz
+  tmux
+)
+
+# Use the chezmoi template variable to check the OS.
+{{ if eq .chezmoi.os "linux" }}
+
+  # Check if the Linux distribution is Arch. This is a simple check based on the presence of a file.
+  if [[ -f /etc/arch-release ]]; then
+    echo "This is an Arch Linux system. Proceeding with installation."
+
+    # Check for the existence of the `yay` command.
+    if ! command -v yay &> /dev/null; then
+      echo "yay is not installed. Installing it now."
+      
+      # This part installs yay manually, as it's an AUR helper.
+      sudo pacman -S --noconfirm --needed git base-devel
+      git clone https://aur.archlinux.org/yay.git /tmp/yay
+      (cd /tmp/yay && makepkg -si --noconfirm)
+      
+      # Clean up the temporary yay directory.
+      rm -rf /tmp/yay
+    fi
+
+    # update the full system 
+    yay -Syyu --noconfirm
+
+    # Create a list of packages that are not already installed.
+    # The `pacman -Q` command queries installed packages. We use `2>/dev/null` to suppress errors.
+    packages_to_install=()
+    for app in "${apps[@]}"; do
+      if ! pacman -Q "$app" &> /dev/null; then
+        packages_to_install+=("$app")
+      else
+        echo "$app is already installed. Skipping."
+      fi
+    done
+
+    # If the list is not empty, install the packages.
+    if [[ ${#packages_to_install[@]} -gt 0 ]]; then
+      echo "Installing the following applications: ${packages_to_install[*]}"
+      yay -S --noconfirm "${packages_to_install[@]}"
+    else
+      echo "All specified applications are already installed. Nothing to do."
+    fi
+
+  else
+    echo "This is not an Arch Linux system. Exiting script."
+  fi
+
+{{ else }}
+  echo "This is not a Linux system. Skipping package installation."
+{{ end }}
