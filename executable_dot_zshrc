@@ -117,7 +117,8 @@ zstyle ':completion:*' menu select=10
 zstyle ':autocomplete:menu:*' max-lines 10
 
 export SSH_AUTH_SOCK="$HOME/.bitwarden-ssh-agent.sock"
-
+export NVIM = "$CONFIG/nvim"
 
 alias pacman="sudo pacman"
 alias sysUpdate="yay -Syyu --noconfirm"
+
