@@ -122,6 +122,10 @@ export SSH_AUTH_SOCK="$HOME/.bitwarden-ssh-agent.sock"
 export PATH="$HOME/.phpenv/bin:$PATH"
 eval "$(phpenv init -)"
 
+# composer
+export PATH="$HOME/.local/bin:$PATH"
+
+
 alias pacman="sudo pacman"
 alias sysUpdate="yay -Syyu --noconfirm"
 
