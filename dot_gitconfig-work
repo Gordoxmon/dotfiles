@@ -1,5 +1,6 @@
 [core]
     sshCommand = "ssh -i ~/.ssh/work"
+
 [user]
     name = "Luís Santos"
     email = "luis@mirinsight.com"
