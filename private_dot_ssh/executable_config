@@ -1,0 +1,12 @@
+# Personal server
+Host staging
+    HostName staging.mirinsight.com
+    User mirai
+    Port 22
+    IdentityFile ~/.ssh/staging
+
+Host peasent
+    HostName 192.168.1.194
+    User gordoxmon
+    Port 22
+
