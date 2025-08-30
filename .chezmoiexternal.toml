@@ -1,6 +1,6 @@
 [".config/nvim"]
 type = "git-repo"
-url = "git@github.com/gordoxmon/nvim"
+url = "https://github.com/Gordoxmon/nvim.git"
 
 [".oh-my-zsh/custom/plugins/zsh-autosuggestions"]
 type = "git-repo"
