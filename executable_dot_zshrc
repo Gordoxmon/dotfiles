@@ -128,4 +128,6 @@ export PATH="$HOME/.local/bin:$PATH"
 
 alias pacman="sudo pacman"
 alias sysUpdate="yay -Syyu --noconfirm"
-alias chonar = "poweroff"
+alias chonar="poweroff"
+
+eval "$(starship init zsh)"
