@@ -1,3 +1,0 @@
-[nodejs]
-detect_files = ["package.json", ".nvmrc", ".node-version", "pnpm-workspace.yaml", "bunfig.toml"]
-

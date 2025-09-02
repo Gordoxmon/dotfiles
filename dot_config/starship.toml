@@ -1,0 +1,8 @@
+# Username (already shown by default)
+[username]
+show_always= true
+
+# Hostname (already shown by default)
+[hostname]
+ssh_only = false
+
