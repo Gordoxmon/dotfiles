@@ -130,4 +130,6 @@ alias pacman="sudo pacman"
 alias sysUpdate="yay -Syyu --noconfirm"
 alias chonar="poweroff"
 
+alias work="cd Documents/Work"
+
 eval "$(starship init zsh)"
