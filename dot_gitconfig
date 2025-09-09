@@ -1,10 +1,7 @@
 [user]
     name = "Luís Santos"
     email = "filica812@gmail.com"
-
-[gpg "ssh"]
-    defaultKeyCommand = "ssh-add -L | head -n1"
-
+    signingKey = "~/.ssh/personalSignature"
 [gpg]
 
     format = "ssh"
@@ -13,7 +10,7 @@
     gpgsign = true
 
 [core]
-	sshCommand = "ssh" 
+	sshCommand = "ssh -i ~/.ssh/personal" 
 
 [includeIf "gitdir:~/Documents/Work/"]
     path = .gitconfig-work

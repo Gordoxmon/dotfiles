@@ -1,3 +1,11 @@
 [user]
     name = "Luís Santos"
     email = "luis@mirinsight.com"
+    signingKey = "~/.ssh/workSignature"
+[core]
+	sshCommand = "ssh -i /home/gordoxmon/.ssh/work"
+[gpg]
+    format = ssh
+[commit]
+    gpgsign = true
+
