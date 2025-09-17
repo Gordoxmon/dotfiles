@@ -101,35 +101,76 @@ source $ZSH/oh-my-zsh.sh
 #
 # Example aliases
 # alias zshconfig="mate ~/.zshrc"
-# alias ohmyzsh="mate ~/.oh-my-zsh"
-eval "$(micromamba shell hook --shell zsh | sed '/PS1=/d')"
 
-# yarn and node stuff
+
+
+
+
+# ---------- helpers ----------
+ 
+# Add a dir to PATH if it exists and isn't already there
+path_add_if_exists() {
+  local d="$1"
+  [[ -d "$d" ]] && [[ ":$PATH:" != *":$d:"* ]] && PATH="$d:$PATH"
+}
+
+# Source a file only if it exists and is readable
+safe_source() { [[ -r "$1" ]] && source "$1"; }
+
+# Check if a command exists
+has() { command -v "$1" >/dev/null 2>&1; }
+
+# ---------- micromamba ----------
+if [[ -x "/usr/bin/micromamba" ]]; then
+  export MAMBA_EXE="/usr/bin/micromamba"
+  export MAMBA_ROOT_PREFIX="${MAMBA_ROOT_PREFIX:-$HOME/.local/share/mamba}"
+  if __mamba_setup="$("$MAMBA_EXE" shell hook --shell zsh --root-prefix "$MAMBA_ROOT_PREFIX" 2>/dev/null)"; then
+    unalias mamba 2>/dev/null   # avoid alias→function conflict
+    eval "$__mamba_setup"
+  else
+    alias micromamba="$MAMBA_EXE"
+  fi
+  unset __mamba_setup
+fi
+
+# ---------- Node / Yarn (nvm) ----------
 export NVM_DIR="$HOME/.nvm"
-[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
-[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"
+safe_source "$NVM_DIR/nvm.sh"
+safe_source "$NVM_DIR/bash_completion"
 
-
-
-# Limit completions and autocomplete suggestions
+# ---------- zsh completion UI tweaks ----------
 zstyle ':completion:*' list-lines 10
 zstyle ':completion:*' menu select=10
 zstyle ':autocomplete:menu:*' max-lines 10
 
-export SSH_AUTH_SOCK="$HOME/.bitwarden-ssh-agent.sock"
+# ---------- SSH agent (Bitwarden) ----------
+# Only set if the socket exists
+if [[ -S "$HOME/.bitwarden-ssh-agent.sock" ]]; then
+  export SSH_AUTH_SOCK="$HOME/.bitwarden-ssh-agent.sock"
+fi
 
-# php env setup
-export PATH="$HOME/.phpenv/bin:$PATH"
-eval "$(phpenv init -)"
+# ---------- phpenv ----------
+if [[ -d "$HOME/.phpenv" ]]; then
+  export PHPRC="$HOME/.phpenv"
+  path_add_if_exists "$HOME/.phpenv/bin"
+  if has phpenv; then
+    eval "$(phpenv init -)"
+  fi
+fi
 
-# composer
-export PATH="$HOME/.local/bin:$PATH"
+# ---------- composer (local vendor bin etc.) ----------
+path_add_if_exists "$HOME/.local/bin"
 
+# ---------- aliases (only if commands/paths exist) ----------
+has pacman && alias pacman="sudo pacman"
+has yay    && alias sysUpdate="yay -Syyu --noconfirm"
+has poweroff && alias chonar="poweroff"
+[[ -d "$HOME/Documents/Work" ]] && alias work='cd "$HOME/Documents/Work"'
 
-alias pacman="sudo pacman"
-alias sysUpdate="yay -Syyu --noconfirm"
-alias chonar="poweroff"
+# ---------- starship ----------
+has starship && eval "$(starship init zsh)"
 
-alias work="cd ~/Documents/Work"
-
-eval "$(starship init zsh)"
+# ---------- SDKMAN (must be last) ----------
+export SDKMAN_DIR="$HOME/.sdkman"
+safe_source "$SDKMAN_DIR/bin/sdkman-init.sh"
+# alias ohmyzsh="mate ~/.oh-my-zsh"
