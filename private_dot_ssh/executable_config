@@ -13,7 +13,7 @@ Host peasent
     IdentityFile ~/.ssh/Home
 
 Host home
-    HostName 176.79.80.156
+    HostName ssh.gordoxmon.pt
     User gordoxmon
     Port 22
     SendEnv TERM
