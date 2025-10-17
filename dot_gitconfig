@@ -12,6 +12,6 @@
 [core]
 	sshCommand = "ssh -i ~/.ssh/personal" 
 
-[includeIf "gitdir:~/Work/"]
+[includeIf "gitdir:~/Projects/Work/"]
     path = .gitconfig-work
 
