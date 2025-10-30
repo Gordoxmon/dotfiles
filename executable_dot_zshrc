@@ -1,113 +1,18 @@
-# If you come from bash you might have to change your $PATH.
-# export PATH=$HOME/bin:$HOME/.local/bin:/usr/local/bin:$PATH
 
-# Path to your Oh My Zsh installation.
+# ---------- Oh My Zsh ----------
 export ZSH="$HOME/.oh-my-zsh"
-
-# Set name of the theme to load --- if set to "random", it will
-# load a random theme each time Oh My Zsh is loaded, in which case,
-# to know which specific one was loaded, run: echo $RANDOM_THEME
-# See https://github.com/ohmyzsh/ohmyzsh/wiki/Themes
 ZSH_THEME="agnoster"
 
-# Set list of themes to pick from when loading at random
-# Setting this variable when ZSH_THEME=random will cause zsh to load
-# a theme from this variable instead of looking in $ZSH/themes/
-# If set to an empty array, this variable will have no effect.
-# ZSH_THEME_RANDOM_CANDIDATES=( "robbyrussell" "agnoster" )
-
-# Uncomment the following line to use case-sensitive completion.
-# CASE_SENSITIVE="true"
-
-# Uncomment the following line to use hyphen-insensitive completion.
-# Case-sensitive completion must be off. _ and - will be interchangeable.
-# HYPHEN_INSENSITIVE="true"
-
-# Uncomment one of the following lines to change the auto-update behavior
-# zstyle ':omz:update' mode disabled  # disable automatic updates
-# zstyle ':omz:update' mode auto      # update automatically without asking
-# zstyle ':omz:update' mode reminder  # just remind me to update when it's time
-
-# Uncomment the following line to change how often to auto-update (in days).
-# zstyle ':omz:update' frequency 13
-
-# Uncomment the following line if pasting URLs and other text is messed up.
-# DISABLE_MAGIC_FUNCTIONS="true"
-
-# Uncomment the following line to disable colors in ls.
-# DISABLE_LS_COLORS="true"
-
-# Uncomment the following line to disable auto-setting terminal title.
-# DISABLE_AUTO_TITLE="true"
-
-# Uncomment the following line to enable command auto-correction.
-# ENABLE_CORRECTION="true"
-
-# Uncomment the following line to display red dots whilst waiting for completion.
-# You can also set it to another string to have that shown instead of the default red dots.
-# e.g. COMPLETION_WAITING_DOTS="%F{yellow}waiting...%f"
-# Caution: this setting can cause issues with multiline prompts in zsh < 5.7.1 (see #5765)
-# COMPLETION_WAITING_DOTS="true"
-
-# Uncomment the following line if you want to disable marking untracked files
-# under VCS as dirty. This makes repository status check for large repositories
-# much, much faster.
-# DISABLE_UNTRACKED_FILES_DIRTY="true"
-
-# Uncomment the following line if you want to change the command execution time
-# stamp shown in the history command output.
-# You can set one of the optional three formats:
-# "mm/dd/yyyy"|"dd.mm.yyyy"|"yyyy-mm-dd"
-# or set a custom format using the strftime function format specifications,
-# see 'man strftime' for details.
-# HIST_STAMPS="mm/dd/yyyy"
-
-# Would you like to use another custom folder than $ZSH/custom?
-# ZSH_CUSTOM=/path/to/new-custom-folder
-
-# Which plugins would you like to load?
-# Standard plugins can be found in $ZSH/plugins/
-# Custom plugins may be added to $ZSH_CUSTOM/plugins/
-# Example format: plugins=(rails git textmate ruby lighthouse)
-# Add wisely, as too many plugins slow down shell startup.
-plugins=(git zsh-autosuggestions zsh-syntax-highlighting fast-syntax-highlighting zsh-autocomplete)
+plugins=(
+  git
+  zsh-autosuggestions
+  fast-syntax-highlighting
+  zsh-autocomplete
+)
 
 source $ZSH/oh-my-zsh.sh
 
-# User configuration
-
-# export MANPATH="/usr/local/man:$MANPATH"
-
-# You may need to manually set your language environment
-# export LANG=en_US.UTF-8
-
-# Preferred editor for local and remote sessions
-# if [[ -n $SSH_CONNECTION ]]; then
-#   export EDITOR='vim'
-# else
-#   export EDITOR='nvim'
-# fi
-
-# Compilation flags
-# export ARCHFLAGS="-arch $(uname -m)"
-
-# Set personal aliases, overriding those provided by Oh My Zsh libs,
-# plugins, and themes. Aliases can be placed here, though Oh My Zsh
-# users are encouraged to define aliases within a top-level file in
-# the $ZSH_CUSTOM folder, with .zsh extension. Examples:
-# - $ZSH_CUSTOM/aliases.zsh
-# - $ZSH_CUSTOM/macos.zsh
-# For a full list of active aliases, run `alias`.
-#
-# Example aliases
-# alias zshconfig="mate ~/.zshrc"
-
-
-
-
-
-# ---------- helpers ----------
- 
+# ---------- Helpers ----------
 # Add a dir to PATH if it exists and isn't already there
 path_add_if_exists() {
   local d="$1"
@@ -120,9 +25,12 @@ safe_source() { [[ -r "$1" ]] && source "$1"; }
 # Check if a command exists
 has() { command -v "$1" >/dev/null 2>&1; }
 
-# ---------- micromamba ----------
-if [[ -x "/usr/bin/micromamba" ]]; then
-  export MAMBA_EXE="/usr/bin/micromamba"
+# Keep PATH unique
+typeset -gU PATH
+
+# ---------- Micromamba ----------
+if has micromamba || [[ -x "/usr/bin/micromamba" ]]; then
+  export MAMBA_EXE="${MAMBA_EXE:-/usr/bin/micromamba}"
   export MAMBA_ROOT_PREFIX="${MAMBA_ROOT_PREFIX:-$HOME/.local/share/mamba}"
   if __mamba_setup="$("$MAMBA_EXE" shell hook --shell zsh --root-prefix "$MAMBA_ROOT_PREFIX" 2>/dev/null)"; then
     unalias mamba 2>/dev/null   # avoid alias→function conflict
@@ -133,23 +41,45 @@ if [[ -x "/usr/bin/micromamba" ]]; then
   unset __mamba_setup
 fi
 
-# ---------- Node / Yarn (nvm) ----------
+# ---------------- Node.js (NVM + Yarn) ----------------
 export NVM_DIR="$HOME/.nvm"
+
+# Load NVM if available
 safe_source "$NVM_DIR/nvm.sh"
 safe_source "$NVM_DIR/bash_completion"
 
-# ---------- zsh completion UI tweaks ----------
-zstyle ':completion:*' list-lines 10
-zstyle ':completion:*' menu select=10
-zstyle ':autocomplete:menu:*' max-lines 10
+# If Node is installed, set up environment
+if has node; then
+  # Ensure NVM’s Node bin dirs are in PATH (critical for corepack/yarn)
+  node_bin_dir="$(dirname "$(command -v node 2>/dev/null)")"
+  path_add_if_exists "$node_bin_dir"
 
-# ---------- SSH agent (Bitwarden) ----------
-# Only set if the socket exists
-if [[ -S "$HOME/.bitwarden-ssh-agent.sock" ]]; then
-  export SSH_AUTH_SOCK="$HOME/.bitwarden-ssh-agent.sock"
+  # Use Node 24 if installed via NVM
+  if has nvm && nvm list 24 >/dev/null 2>&1; then
+    nvm use 24 >/dev/null
+  fi
+
+  # Enable Corepack if available (ensures Yarn & pnpm work)
+  if has corepack; then
+    corepack enable >/dev/null 2>&1
+  fi
+
+  # Ensure npm global bin is in PATH
+  npm_prefix="$(npm config get prefix 2>/dev/null)"
+  if [[ -n "$npm_prefix" ]]; then
+    path_add_if_exists "$npm_prefix/bin"
+  fi
+
+  # Add Yarn global bin (for legacy setups)
+  path_add_if_exists "$HOME/.yarn/bin"
+
+  # Print versions once per session
+  if [ -z "$_NODE_ENV_SETUP_DONE" ]; then
+    export _NODE_ENV_SETUP_DONE=1
+  fi
 fi
 
-# ---------- phpenv ----------
+# ---------- PHPEnv ----------
 if [[ -d "$HOME/.phpenv" ]]; then
   export PHPRC="$HOME/.phpenv"
   path_add_if_exists "$HOME/.phpenv/bin"
@@ -158,24 +88,67 @@ if [[ -d "$HOME/.phpenv" ]]; then
   fi
 fi
 
-# ---------- composer (local vendor bin etc.) ----------
+# ---------- PHPEnv ----------
+if [[ -d "$HOME/.phpenv" ]]; then
+  export PHPRC="$HOME/.phpenv"
+  path_add_if_exists "$HOME/.phpenv/bin"
+  if has phpenv; then
+    eval "$(phpenv init -)"
+  fi
+fi
+
+# ---------- Go ----------
+path_add_if_exists "/usr/local/go/bin"
+
+# ---------- Composer (local vendor bin etc.) ----------
 path_add_if_exists "$HOME/.local/bin"
 
-# ---------- aliases (only if commands/paths exist) ----------
+# ---------- SSH agent (Bitwarden) ----------
+if [[ -S "$HOME/.bitwarden-ssh-agent.sock" ]]; then
+  export SSH_AUTH_SOCK="$HOME/.bitwarden-ssh-agent.sock"
+fi
+
+# ---------- Zsh Completion UI tweaks ----------
+zstyle ':completion:*' list-lines 10
+zstyle ':completion:*' menu select=10
+zstyle ':autocomplete:menu:*' max-lines 10
+
+# ---------- Shell behavior tweaks ----------
+setopt autocd              # cd into directories by typing their name
+setopt histignoredups      # ignore duplicate history entries
+setopt sharehistory        # share history across sessions
+setopt correct_all          # auto-correct command typos
+
+# ---------- Aliases ----------
 has pacman && alias pacman="sudo pacman"
-has yay    && alias sysUpdate="yay -Syyu --noconfirm"
+has yay && alias sysUpdate="yay -Syyu --noconfirm"
 has poweroff && alias chonar="poweroff"
 has eza && alias ls="eza -G --icons"
+has bat && alias cat="bat"
 has nvim && alias nvimConf="cd ~/.config/nvim && nvim init.lua"
 has kitty && alias kittyConf="cd ~/.config/kitty && nvim kitty.conf"
 
-
-[[ -d "$HOME/Documents/Work" ]] && alias work='cd "$HOME/Documents/Work"'
-
-# ---------- starship ----------
+# ---------- Starship ----------
 has starship && eval "$(starship init zsh)"
 
-# ---------- SDKMAN (must be last) ----------
+# ---------- SDKMAN ----------
 export SDKMAN_DIR="$HOME/.sdkman"
 safe_source "$SDKMAN_DIR/bin/sdkman-init.sh"
-# alias ohmyzsh="mate ~/.oh-my-zsh"
+
+# ---------- Language / Locale ----------
+export LANG=en_US.UTF-8
+export LC_ALL=en_US.UTF-8
+
+# ---------- Editor ----------
+if [[ -n $SSH_CONNECTION ]]; then
+  export EDITOR='vim'
+else
+  export EDITOR='nvim'
+fi
+
+# ---------- PATH sanity check ----------
+path_add_if_exists "$HOME/bin"
+path_add_if_exists "$HOME/.local/bin"
+path_add_if_exists "/usr/local/bin"
+path_add_if_exists "$HOME/Projects/Personal/scripts"
+path_add_if_exists "$HOME/.nvm/versions/node/v24.10.0/bin"
